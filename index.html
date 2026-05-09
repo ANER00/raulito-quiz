@@ -17,7 +17,7 @@
         #timer { font-size: 28px; color: #ff4757; font-weight: bold; margin: 10px 0; }
         #score { transition: all 0.3s ease; display: inline-block; font-weight: bold; color: #2ed573; font-size: 24px; }
         .hidden { display: none; }
-        h2 { animation: fadeIn 0.5s ease-in; min-height: 60px; }
+        h2 { animation: fadeIn 0.5s ease-in; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
@@ -38,8 +38,8 @@
     </div>
 
     <script>
-        const banco = [
-            {p: "¿Cuál es la comida favorita de Emi?", o: ["Pepinillo", "Pepino", "Pickle"], c: "Pepinillo"},
+        const bancoOriginal = [
+            {p: "¿Cuál es la comida favorita de Emi?", o: ["Pepinillo", "Pepino", "Pickle"], c: "Pepino"},
             {p: "¿Cuál es el nombre de la hija de la Vero?", o: ["Alice", "Alicia", "Aliss"], c: "Alice"},
             {p: "¿Qué instrumento tocó Martincito durante Camver 2026?", o: ["Guitarra", "Ukelele", "Violín"], c: "Guitarra"},
             {p: "¿Qué animal picó el pie de Isi durante Camver 2026?", o: ["Avispa", "Abeja", "Avión"], c: "Avispa"},
@@ -53,13 +53,18 @@
             {p: "¿Cuál es el río más largo del mundo?", o: ["Amazonas", "Río Rahue", "Mapocho"], c: "Amazonas"},
             {p: "¿Quién fue la tercera pareja de Gala en 'Volverías con tu ex'?", o: ["Leandro", "Marco", "Luis"], c: "Leandro"},
             {p: "¿Quién del clan es gachatuber famoso en secreto?", o: ["Ro", "Matoas", "May"], c: "Ro"},
-            {p: "¿Cómo se llamaba el programa donde bailaban 'axé'?", o: ["Mekano", "Rojo", "Calle 7"], c: "Mekano"},
+            {p: "¿Cómo se llamaba el programa juvenil donde bailaban 'axé'?", o: ["Mekano", "Rojo", "Calle 7"], c: "Mekano"},
             {p: "¿Qué personaje decía '¡Tangananica o tangananá!'?", o: ["Guru Guru", "Tulio Triviño", "Juan Carlos Bodoque"], c: "Guru Guru"}
         ];
 
         let puntaje = 0;
         let t;
         let segs = 15;
+        let preguntasPendientes = [];
+
+        function mezclarBanco() {
+            preguntasPendientes = [...bancoOriginal].sort(() => Math.random() - 0.5);
+        }
 
         function cargar() {
             if (puntaje >= 40000) {
@@ -67,12 +72,18 @@
                 document.getElementById('win-screen').classList.remove('hidden');
                 return;
             }
+
+            if (preguntasPendientes.length === 0) {
+                mezclarBanco();
+            }
+
             clearInterval(t);
             segs = 15;
             document.getElementById('timer').innerText = segs;
             
-            const q = banco[Math.floor(Math.random() * banco.length)];
+            const q = preguntasPendientes.pop();
             document.getElementById('question').innerText = q.p;
+            
             const caja = document.getElementById('options');
             caja.innerHTML = '';
             
@@ -123,6 +134,8 @@
                 }
             }, 1000);
         }
+
+        mezclarBanco();
         cargar();
     </script>
 </body>
