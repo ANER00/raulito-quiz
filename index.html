@@ -1,82 +1,92 @@
-import random
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.clock import Clock
-from kivy.properties import NumericProperty, StringProperty, ListProperty
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAULITO QUIZ</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #2c3e50; color: white; padding: 20px; }
+        .hidden { display: none; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #3498db; border: none; color: white; border-radius: 8px; font-size: 18px; }
+        #timer { font-size: 24px; color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>RAULITO QUIZ</h1>
+        <p>Puntos: <span id="score">0</span> / 40.000</p>
+        <div id="timer">15</div>
+        <h2 id="question">Cargando...</h2>
+        <div id="options"></div>
+    </div>
 
-# --- Banco de Preguntas ---
-# 8 de Cultura General y 8 de Guías y Scouts de Chile
-PREGUNTAS_DB = [
-    {"q": "¿Cuál es el color de la flor nacional de Chile?", "a": ["Rojo", "Blanco", "Azul"], "c": "Rojo", "t": "Cultura"},
-    {"q": "¿Qué planeta es conocido como el planeta rojo?", "a": ["Marte", "Venus", "Júpiter"], "c": "Marte", "t": "Cultura"},
-    {"q": "¿Cuál es el río más largo del mundo?", "a": ["Amazonas", "Nilo", "Misisipi"], "c": "Amazonas", "t": "Cultura"},
-    {"q": "¿Quién escribió 'El Quijote'?", "a": ["Cervantes", "Shakespeare", "Neruda"], "c": "Cervantes", "t": "Cultura"},
-    {"q": "¿En qué continente está Egipto?", "a": ["África", "Asia", "Europa"], "c": "África", "t": "Cultura"},
-    {"q": "¿Cuál es el metal más caro del mundo?", "a": ["Rodio", "Oro", "Plata"], "c": "Rodio", "t": "Cultura"},
-    {"q": "¿Cuántos años dura un lustro?", "a": ["5 años", "10 años", "100 años"], "c": "5 años", "t": "Cultura"},
-    {"q": "¿Cuál es el océano más grande?", "a": ["Pacífico", "Atlántico", "Indico"], "c": "Pacífico", "t": "Cultura"},
-    
-    # Guías y Scouts de Chile
-    {"q": "¿Quién fundó el Movimiento Scout?", "a": ["Baden-Powell", "Dr. Alcibíades Vicencio", "Joaquín Cabezas"], "c": "Baden-Powell", "t": "Scout"},
-    {"q": "¿Cuál es el lema de los Scouts?", "a": ["Siempre Listos", "Servir", "Mejor Verdad"], "c": "Siempre Listos", "t": "Scout"},
-    {"q": "¿Cuál es la flor que representa a las Guías?", "a": ["Trébol", "Lis", "Copihue"], "c": "Trébol", "t": "Scout"},
-    {"q": "¿Cómo se llama el fundador del Scoutismo en Chile?", "a": ["Alcibíades Vicencio", "Baden-Powell", "Bernardo O'Higgins"], "c": "Alcibíades Vicencio", "t": "Scout"},
-    {"q": "¿Qué significa la 'Buena Acción' diaria?", "a": ["Ayudar al prójimo", "Ganar puntos", "Limpiar mi cuarto"], "c": "Ayudar al prójimo", "t": "Scout"},
-    {"q": "¿Cuántas partes tiene la Promesa Scout?", "a": ["Tres partes", "Dos partes", "Cinco partes"], "c": "Tres partes", "t": "Scout"},
-    {"q": "¿Cómo se llama la unidad de los más pequeños (6-11 años)?", "a": ["Lobatos/Golondrinas", "Pioneros", "Ruta"], "c": "Lobatos/Golondrinas", "t": "Scout"},
-    {"q": "¿Cuál es la seña Scout?", "a": ["3 dedos levantados", "Mano cerrada", "V de victoria"], "c": "3 dedos levantados", "t": "Scout"},
-]
+    <div id="win-screen" class="hidden">
+        <h1>¡FELICIDADES!</h1>
+        <p>Has alcanzado los 40.000 puntos.</p>
+        <button class="btn" onclick="location.reload()">Jugar de nuevo</button>
+    </div>
 
-class GameScreen(Screen):
-    pregunta_texto = StringProperty("")
-    opciones = ListProperty(["", "", ""])
-    puntos = NumericProperty(0)
-    tiempo = NumericProperty(15)
-    
-    def on_enter(self):
-        self.preguntas_restantes = list(PREGUNTAS_DB)
-        random.shuffle(self.preguntas_restantes)
-        self.puntos = 0
-        self.siguiente_pregunta()
+    <script>
+        const preguntas = [
+            {p: "¿Quién fundó los Scouts?", o: ["Baden-Powell", "San Jorge", "B.P. Simpson"], c: "Baden-Powell"},
+            {p: "¿Cuál es el lema Scout?", o: ["Siempre Listos", "Dar lo mejor", "Servir"], c: "Siempre Listos"},
+            {p: "¿Dónde fue el Jamboree Mundial en Chile?", o: ["Picarquín", "Osorno", "Valparaíso"], c: "Picarquín"},
+            {p: "¿Rama de 6 a 11 años?", o: ["Lobatos/Golondrinas", "Ruta", "Tropa"], c: "Lobatos/Golondrinas"},
+            {p: "¿Color de la pañoleta nacional?", o: ["Rojo, azul y blanco", "Verde", "Amarillo"], c: "Rojo, azul y blanco"},
+            {p: "¿Qué animal representa a la Manada?", o: ["Lobo", "Águila", "Zorro"], c: "Lobo"},
+            {p: "¿Santo Patrono de los Scouts?", o: ["San Jorge", "San Francisco", "San Pedro"], c: "San Jorge"},
+            {p: "¿Significado de la Buena Acción?", o: ["Ayudar al prójimo", "Hacer nudos", "Cantar"], c: "Ayudar al prójimo"},
+            {p: "¿Capital de Chile?", o: ["Santiago", "Valdivia", "Concepción"], c: "Santiago"},
+            {p: "¿Idioma de Brasil?", o: ["Portugués", "Español", "Inglés"], c: "Portugués"},
+            {p: "¿Planeta más grande?", o: ["Júpiter", "Marte", "Tierra"], c: "Júpiter"},
+            {p: "¿Moneda de Chile?", o: ["Peso", "Dólar", "Euro"], c: "Peso"},
+            {p: "¿Continente de Egipto?", o: ["África", "Asia", "Europa"], c: "África"},
+            {p: "¿Metal más caro?", o: ["Rodio", "Oro", "Cobre"], c: "Rodio"},
+            {p: "¿Héroe del Combate de Iquique?", o: ["Arturo Prat", "Bernardo O'Higgins", "Manuel Rodríguez"], c: "Arturo Prat"},
+            {p: "¿Pintor de la Mona Lisa?", o: ["Da Vinci", "Van Gogh", "Dalí"], c: "Da Vinci"}
+        ];
 
-    def siguiente_pregunta(self):
-        if self.puntos >= 40000:
-            self.manager.current = 'felicidades'
-            return
+        let score = 0;
+        let timeLeft = 15;
+        let timer;
 
-        if not self.preguntas_restantes:
-            # Si se acaban las 16, volvemos a mezclarlas para seguir sumando hasta 40k
-            self.preguntas_restantes = list(PREGUNTAS_DB)
-            random.shuffle(self.preguntas_restantes)
+        function nextQuestion() {
+            if (score >= 40000) {
+                document.getElementById('game-container').classList.add('hidden');
+                document.getElementById('win-screen').classList.remove('hidden');
+                return;
+            }
 
-        self.pregunta_actual = self.preguntas_restantes.pop()
-        self.pregunta_texto = self.pregunta_actual["q"]
-        self.opciones = self.pregunta_actual["a"]
-        random.shuffle(self.opciones)
-        self.tiempo = 15
-        
-        Clock.unschedule(self.update_timer)
-        Clock.schedule_interval(self.update_timer, 1)
+            clearInterval(timer);
+            timeLeft = 15;
+            document.getElementById('timer').innerText = timeLeft;
+            
+            const q = preguntas[Math.floor(Math.random() * preguntas.length)];
+            document.getElementById('question').innerText = q.p;
+            const opts = document.getElementById('options');
+            opts.innerHTML = '';
+            
+            q.o.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === q.c) score += 5000;
+                    document.getElementById('score').innerText = score;
+                    nextQuestion();
+                };
+                opts.appendChild(btn);
+            });
 
-    def update_timer(self, dt):
-        self.tiempo -= 1
-        if self.tiempo <= 0:
-            self.siguiente_pregunta()
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = timeLeft;
+                if (timeLeft <= 0) nextQuestion();
+            }, 1000);
+        }
 
-    def verificar_respuesta(self, respuesta):
-        if respuesta == self.pregunta_actual["c"]:
-            self.puntos += 500
-        self.siguiente_pregunta()
-
-class WinScreen(Screen):
-    pass
-
-class RaulitoQuiz(App):
-    def build(self):
-        sm = ScreenManager()
-        sm.add_widget(GameScreen(name='juego'))
-        sm.add_widget(WinScreen(name='felicidades'))
-        return sm
-
-if __name__ == '__main__':
-    RaulitoQuiz().run()
+        nextQuestion();
+    </script>
+</body>
+</html>
