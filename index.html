@@ -11,66 +11,50 @@
         }
     </script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 15px; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #007bff; border: none; color: white; border-radius: 8px; font-size: 18px; cursor: pointer; }
-        #timer { font-size: 28px; color: #ff4757; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #007bff; border: none; color: white; border-radius: 8px; font-size: 18px; cursor: pointer; transition: all 0.3s ease; }
+        #timer { font-size: 28px; color: #ff4757; font-weight: bold; margin: 10px 0; }
+        #score { transition: all 0.3s ease; display: inline-block; font-weight: bold; color: #2ed573; }
         .hidden { display: none; }
-        .btn {
-            transition: all 0.3s ease; /* Animación suave de color y tamaño */
-        }
-
-        /* Animación de pulso para la respuesta correcta cuando te equivocas */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Animación de entrada para la pregunta */
-        h2 {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        h2 { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
     <div class="container" id="game-container">
         <h1>RAULITO QUIZ</h1>
-        <p>Puntos: <strong id="score">0</strong> / 40.000</p>
+        <p>Puntos: <span id="score">0</span> / 40.000</p>
         <div id="timer">15</div>
         <h2 id="question">Cargando...</h2>
         <div id="options"></div>
     </div>
 
     <div class="container hidden" id="win-screen">
-        <h1>¡FELICIDADES!</h1>
-        <p>Meta de 40.000 puntos alcanzada.</p>
-        <button class="btn" onclick="location.reload()">Reiniciar</button>
+        <h1 style="color: #2ed573;">¡FELICIDADES!</h1>
+        <p>Has alcanzado los 40.000 puntos.</p>
+        <button class="btn" onclick="location.reload()">Jugar de nuevo</button>
     </div>
 
     <script>
         const banco = [
-            {p: "¿Quién fundó los Scouts?", o: ["Baden-Powell", "San Jorge", "B.P. Simpson"], c: "Baden-Powell"},
-            {p: "¿Cuál es el lema Scout?", o: ["Siempre Listos", "Dar lo mejor", "Servir"], c: "Siempre Listos"},
-            {p: "¿Dónde fue el Jamboree de 1999?", o: ["Picarquín", "Osorno", "Chillán"], c: "Picarquín"},
-            {p: "¿Rama de 6 a 11 años?", o: ["Lobatos/Golondrinas", "Ruta", "Tropa"], c: "Lobatos/Golondrinas"},
-            {p: "¿Animal símbolo de la Manada?", o: ["Lobo", "Zorro", "Águila"], c: "Lobo"},
-            {p: "¿Flor símbolo Scout?", o: ["Flor de Lis", "Rosa", "Copihue"], c: "Flor de Lis"},
-            {p: "¿Significado de la Buena Acción?", o: ["Ayudar al prójimo", "Hacer nudos", "Cantar"], c: "Ayudar al prójimo"},
-            {p: "¿Color de la pañoleta nacional?", o: ["Rojo, azul y blanco", "Verde", "Gris"], c: "Rojo, azul y blanco"},
-            {p: "¿Capital de Chile?", o: ["Santiago", "Valdivia", "Concepción"], c: "Santiago"},
-            {p: "¿Idioma de Brasil?", o: ["Portugués", "Español", "Inglés"], c: "Portugués"},
-            {p: "¿Planeta más grande?", o: ["Júpiter", "Marte", "Tierra"], c: "Júpiter"},
-            {p: "¿Moneda de Chile?", o: ["Peso", "Dólar", "Euro"], c: "Peso"},
-            {p: "¿Continente de Egipto?", o: ["África", "Asia", "Europa"], c: "África"},
-            {p: "¿Metal más caro?", o: ["Rodio", "Oro", "Plata"], c: "Rodio"},
-            {p: "¿Héroe de Iquique?", o: ["Arturo Prat", "O'Higgins", "Rodríguez"], c: "Arturo Prat"},
-            {p: "¿Pintor de la Mona Lisa?", o: ["Da Vinci", "Van Gogh", "Dalí"], c: "Da Vinci"}
+            {p: "¿Quién fundó el Movimiento Scout?", o: ["Baden-Powell", "San Jorge", "Peter Pan"], c: "Baden-Powell"},
+            {p: "¿Cuál es el lema de los Scouts en Chile?", o: ["Siempre Listos", "Dar lo mejor", "Servir"], c: "Siempre Listos"},
+            {p: "¿Dónde fue el Jamboree Mundial en Chile?", o: ["Picarquín", "Osorno", "Chillán"], c: "Picarquín"},
+            {p: "¿Cómo se llama la rama de 6 a 11 años?", o: ["Lobatos/Golondrinas", "Ruta", "Tropa"], c: "Lobatos/Golondrinas"},
+            {p: "¿Qué animal representa a la Manada?", o: ["Lobo", "Águila", "Zorro"], c: "Lobo"},
+            {p: "¿Cuál es el color de la pañoleta nacional?", o: ["Rojo, azul y blanco", "Verde y gris", "Azul entero"], c: "Rojo, azul y blanco"},
+            {p: "¿Qué significa la Flor de Lis?", o: ["Símbolo Scout", "Una planta real", "Un nudo"], c: "Símbolo Scout"},
+            {p: "¿Qué es la 'Buena Acción' diaria?", o: ["Ayudar al prójimo", "Hacer ejercicio", "Ganar dinero"], c: "Ayudar al prójimo"},
+            {p: "¿Cuál es la capital de Chile?", o: ["Santiago", "Valdivia", "Concepción"], c: "Santiago"},
+            {p: "¿Qué idioma se habla en Brasil?", o: ["Portugués", "Español", "Francés"], c: "Portugués"},
+            {p: "¿Cuál es el planeta más grande?", o: ["Júpiter", "Marte", "Saturno"], c: "Júpiter"},
+            {p: "¿En qué continente está Egipto?", o: ["África", "Asia", "Europa"], c: "África"},
+            {p: "¿Quién pintó la Mona Lisa?", o: ["Da Vinci", "Picasso", "Dalí"], c: "Da Vinci"},
+            {p: "¿Cuál es el metal más caro del mundo?", o: ["Rodio", "Oro", "Plata"], c: "Rodio"},
+            {p: "¿Héroe del Combate Naval de Iquique?", o: ["Arturo Prat", "O'Higgins", "Baquedano"], c: "Arturo Prat"},
+            {p: "¿Qué país tiene forma de bota?", o: ["Italia", "Chile", "Grecia"], c: "Italia"}
         ];
 
         let puntaje = 0;
@@ -89,7 +73,6 @@
             
             const q = banco[Math.floor(Math.random() * banco.length)];
             document.getElementById('question').innerText = q.p;
-            
             const caja = document.getElementById('options');
             caja.innerHTML = '';
             
@@ -99,21 +82,17 @@
                 const b = document.createElement('button');
                 b.className = 'btn';
                 b.innerText = opcion;
-                
                 b.onclick = () => {
                     const botones = caja.querySelectorAll('.btn');
                     botones.forEach(btn => btn.style.pointerEvents = 'none');
                     clearInterval(t);
 
                     if (opcion === q.c) {
-                        // ACIERTO: +5000 puntos
-                        b.style.background = "#2ed573"; 
-                        b.style.transform = "scale(1.05)";
+                        b.style.background = "#2ed573";
                         puntaje += 5000;
                     } else {
-                        // ERROR: -100 puntos, rojo el elegido, verde el correcto
                         b.style.background = "#ff4757";
-                        puntaje = Math.max(0, puntaje - 100); // No baja de 0
+                        puntaje = Math.max(0, puntaje - 100);
                         botones.forEach(btn => {
                             if (btn.innerText === q.c) {
                                 btn.style.background = "#2ed573";
@@ -121,32 +100,24 @@
                             }
                         });
                     }
-
                     document.getElementById('score').innerText = puntaje;
                     setTimeout(cargar, 1500);
                 };
                 caja.appendChild(b);
             });
 
-            // Lógica del temporizador con penalización
             t = setInterval(() => {
                 segs--;
                 document.getElementById('timer').innerText = segs;
                 if (segs <= 0) {
                     clearInterval(t);
-                    // PENALIZACIÓN POR TIEMPO: -100 puntos
                     puntaje = Math.max(0, puntaje - 100);
                     document.getElementById('score').innerText = puntaje;
-                    
-                    // Mostrar cuál era la correcta brevemente antes de saltar
                     const botones = caja.querySelectorAll('.btn');
                     botones.forEach(btn => {
                         btn.style.pointerEvents = 'none';
-                        if (btn.innerText === q.c) {
-                            btn.style.background = "#2ed573";
-                        }
+                        if (btn.innerText === q.c) btn.style.background = "#2ed573";
                     });
-                    
                     setTimeout(cargar, 1500);
                 }
             }, 1000);
