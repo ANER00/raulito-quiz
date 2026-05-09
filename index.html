@@ -101,19 +101,19 @@
                 b.innerText = opcion;
                 
                 b.onclick = () => {
-                    // Bloquear otros clics mientras se muestra la respuesta
                     const botones = caja.querySelectorAll('.btn');
                     botones.forEach(btn => btn.style.pointerEvents = 'none');
                     clearInterval(t);
 
                     if (opcion === q.c) {
-                        // ACIERTO: Solo verde
+                        // ACIERTO: +5000 puntos
                         b.style.background = "#2ed573"; 
                         b.style.transform = "scale(1.05)";
                         puntaje += 5000;
                     } else {
-                        // ERROR: Rojo el elegido, verde el correcto
+                        // ERROR: -100 puntos, rojo el elegido, verde el correcto
                         b.style.background = "#ff4757";
+                        puntaje = Math.max(0, puntaje - 100); // No baja de 0
                         botones.forEach(btn => {
                             if (btn.innerText === q.c) {
                                 btn.style.background = "#2ed573";
@@ -123,17 +123,32 @@
                     }
 
                     document.getElementById('score').innerText = puntaje;
-                    
-                    // Esperar 1.5 segundos para ver el resultado antes de la siguiente
                     setTimeout(cargar, 1500);
                 };
                 caja.appendChild(b);
             });
 
+            // Lógica del temporizador con penalización
             t = setInterval(() => {
                 segs--;
                 document.getElementById('timer').innerText = segs;
-                if (segs <= 0) cargar();
+                if (segs <= 0) {
+                    clearInterval(t);
+                    // PENALIZACIÓN POR TIEMPO: -100 puntos
+                    puntaje = Math.max(0, puntaje - 100);
+                    document.getElementById('score').innerText = puntaje;
+                    
+                    // Mostrar cuál era la correcta brevemente antes de saltar
+                    const botones = caja.querySelectorAll('.btn');
+                    botones.forEach(btn => {
+                        btn.style.pointerEvents = 'none';
+                        if (btn.innerText === q.c) {
+                            btn.style.background = "#2ed573";
+                        }
+                    });
+                    
+                    setTimeout(cargar, 1500);
+                }
             }, 1000);
         }
         cargar();
