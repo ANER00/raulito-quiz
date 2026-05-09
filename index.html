@@ -5,88 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAULITO QUIZ</title>
     <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #2c3e50; color: white; padding: 20px; }
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 15px; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #007bff; border: none; color: white; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        #timer { font-size: 28px; color: #ff4757; font-weight: bold; }
         .hidden { display: none; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #3498db; border: none; color: white; border-radius: 8px; font-size: 18px; }
-        #timer { font-size: 24px; color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="game-container">
+    <div class="container" id="game-container">
         <h1>RAULITO QUIZ</h1>
-        <p>Puntos: <span id="score">0</span> / 40.000</p>
+        <p>Puntos: <strong id="score">0</strong> / 40.000</p>
         <div id="timer">15</div>
         <h2 id="question">Cargando...</h2>
         <div id="options"></div>
     </div>
 
-    <div id="win-screen" class="hidden">
+    <div class="container hidden" id="win-screen">
         <h1>¡FELICIDADES!</h1>
-        <p>Has alcanzado los 40.000 puntos.</p>
-        <button class="btn" onclick="location.reload()">Jugar de nuevo</button>
+        <p>Meta de 40.000 puntos alcanzada.</p>
+        <button class="btn" onclick="location.reload()">Reiniciar</button>
     </div>
 
     <script>
-        const preguntas = [
+        const banco = [
             {p: "¿Quién fundó los Scouts?", o: ["Baden-Powell", "San Jorge", "B.P. Simpson"], c: "Baden-Powell"},
             {p: "¿Cuál es el lema Scout?", o: ["Siempre Listos", "Dar lo mejor", "Servir"], c: "Siempre Listos"},
-            {p: "¿Dónde fue el Jamboree Mundial en Chile?", o: ["Picarquín", "Osorno", "Valparaíso"], c: "Picarquín"},
+            {p: "¿Dónde fue el Jamboree de 1999?", o: ["Picarquín", "Osorno", "Chillán"], c: "Picarquín"},
             {p: "¿Rama de 6 a 11 años?", o: ["Lobatos/Golondrinas", "Ruta", "Tropa"], c: "Lobatos/Golondrinas"},
-            {p: "¿Color de la pañoleta nacional?", o: ["Rojo, azul y blanco", "Verde", "Amarillo"], c: "Rojo, azul y blanco"},
-            {p: "¿Qué animal representa a la Manada?", o: ["Lobo", "Águila", "Zorro"], c: "Lobo"},
-            {p: "¿Santo Patrono de los Scouts?", o: ["San Jorge", "San Francisco", "San Pedro"], c: "San Jorge"},
+            {p: "¿Animal símbolo de la Manada?", o: ["Lobo", "Zorro", "Águila"], c: "Lobo"},
+            {p: "¿Flor símbolo Scout?", o: ["Flor de Lis", "Rosa", "Copihue"], c: "Flor de Lis"},
             {p: "¿Significado de la Buena Acción?", o: ["Ayudar al prójimo", "Hacer nudos", "Cantar"], c: "Ayudar al prójimo"},
+            {p: "¿Color de la pañoleta nacional?", o: ["Rojo, azul y blanco", "Verde", "Gris"], c: "Rojo, azul y blanco"},
             {p: "¿Capital de Chile?", o: ["Santiago", "Valdivia", "Concepción"], c: "Santiago"},
             {p: "¿Idioma de Brasil?", o: ["Portugués", "Español", "Inglés"], c: "Portugués"},
             {p: "¿Planeta más grande?", o: ["Júpiter", "Marte", "Tierra"], c: "Júpiter"},
             {p: "¿Moneda de Chile?", o: ["Peso", "Dólar", "Euro"], c: "Peso"},
             {p: "¿Continente de Egipto?", o: ["África", "Asia", "Europa"], c: "África"},
-            {p: "¿Metal más caro?", o: ["Rodio", "Oro", "Cobre"], c: "Rodio"},
-            {p: "¿Héroe del Combate de Iquique?", o: ["Arturo Prat", "Bernardo O'Higgins", "Manuel Rodríguez"], c: "Arturo Prat"},
+            {p: "¿Metal más caro?", o: ["Rodio", "Oro", "Plata"], c: "Rodio"},
+            {p: "¿Héroe de Iquique?", o: ["Arturo Prat", "O'Higgins", "Rodríguez"], c: "Arturo Prat"},
             {p: "¿Pintor de la Mona Lisa?", o: ["Da Vinci", "Van Gogh", "Dalí"], c: "Da Vinci"}
         ];
 
-        let score = 0;
-        let timeLeft = 15;
-        let timer;
+        let puntaje = 0;
+        let t;
+        let segs = 15;
 
-        function nextQuestion() {
-            if (score >= 40000) {
+        function cargar() {
+            if (puntaje >= 40000) {
                 document.getElementById('game-container').classList.add('hidden');
                 document.getElementById('win-screen').classList.remove('hidden');
                 return;
             }
-
-            clearInterval(timer);
-            timeLeft = 15;
-            document.getElementById('timer').innerText = timeLeft;
-            
-            const q = preguntas[Math.floor(Math.random() * preguntas.length)];
+            clearInterval(t);
+            segs = 15;
+            document.getElementById('timer').innerText = segs;
+            const q = banco[Math.floor(Math.random() * banco.length)];
             document.getElementById('question').innerText = q.p;
-            const opts = document.getElementById('options');
-            opts.innerHTML = '';
-            
-            q.o.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'btn';
-                btn.innerText = opt;
-                btn.onclick = () => {
-                    if (opt === q.c) score += 5000;
-                    document.getElementById('score').innerText = score;
-                    nextQuestion();
+            const caja = document.getElementById('options');
+            caja.innerHTML = '';
+            q.o.sort(() => Math.random() - 0.5).forEach(opc => {
+                const b = document.createElement('button');
+                b.className = 'btn';
+                b.innerText = opc;
+                b.onclick = () => {
+                    if (opc === q.c) puntaje += 5000;
+                    document.getElementById('score').innerText = puntaje;
+                    cargar();
                 };
-                opts.appendChild(btn);
+                caja.appendChild(b);
             });
-
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').innerText = timeLeft;
-                if (timeLeft <= 0) nextQuestion();
+            t = setInterval(() => {
+                segs--;
+                document.getElementById('timer').innerText = segs;
+                if (segs <= 0) cargar();
             }, 1000);
         }
-
-        nextQuestion();
+        cargar();
     </script>
 </body>
 </html>
