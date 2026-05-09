@@ -25,7 +25,7 @@
 <body>
     <div class="container" id="game-container">
         <h1>RAULITO QUIZ</h1>
-        <p>Puntos: <span id="score">0</span> / 40.000</p>
+        <p>Puntos: <span id="score">0</span> / 60.000</p>
         <div id="timer">15</div>
         <h2 id="question">Cargando...</h2>
         <div id="options"></div>
@@ -33,7 +33,7 @@
 
     <div class="container hidden" id="win-screen">
         <h1 style="color: #2ed573;">¡FELICIDADES!</h1>
-        <p>Has alcanzado los 40.000 puntos.</p>
+        <p>Has alcanzado los 60.000 puntos.</p>
         <button class="btn" onclick="location.reload()">Jugar de nuevo</button>
     </div>
 
@@ -67,7 +67,7 @@
         }
 
         function cargar() {
-            if (puntaje >= 40000) {
+            if (puntaje >= 60000) {
                 document.getElementById('game-container').classList.add('hidden');
                 document.getElementById('win-screen').classList.remove('hidden');
                 return;
