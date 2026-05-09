@@ -1,9 +1,34 @@
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open('v1').then((cache) => cache.addAll(['index.html', 'manifest.json']))
+const CACHE_NAME = 'raulito-quiz-v2';
+const assets = [
+  'index.html',
+  'manifest.json',
+  'sw.js'
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(assets);
+    })
   );
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
+});
+
+// Limpiar versiones antiguas de caché
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+      );
+    })
+  );
 });
