@@ -11,13 +11,13 @@
         }
     </script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 20px; }
         .container { max-width: 500px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #007bff; border: none; color: white; border-radius: 8px; font-size: 18px; cursor: pointer; transition: all 0.3s ease; }
         #timer { font-size: 28px; color: #ff4757; font-weight: bold; margin: 10px 0; }
-        #score { transition: all 0.3s ease; display: inline-block; font-weight: bold; color: #2ed573; }
+        #score { transition: all 0.3s ease; display: inline-block; font-weight: bold; color: #2ed573; font-size: 24px; }
         .hidden { display: none; }
-        h2 { animation: fadeIn 0.5s ease-in; }
+        h2 { animation: fadeIn 0.5s ease-in; min-height: 60px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
@@ -39,22 +39,22 @@
 
     <script>
         const banco = [
-            {p: "¿Quién fundó el Movimiento Scout?", o: ["Baden-Powell", "San Jorge", "Peter Pan"], c: "Baden-Powell"},
-            {p: "¿Cuál es el lema de los Scouts en Chile?", o: ["Siempre Listos", "Dar lo mejor", "Servir"], c: "Siempre Listos"},
-            {p: "¿Dónde fue el Jamboree Mundial en Chile?", o: ["Picarquín", "Osorno", "Chillán"], c: "Picarquín"},
-            {p: "¿Cómo se llama la rama de 6 a 11 años?", o: ["Lobatos/Golondrinas", "Ruta", "Tropa"], c: "Lobatos/Golondrinas"},
-            {p: "¿Qué animal representa a la Manada?", o: ["Lobo", "Águila", "Zorro"], c: "Lobo"},
-            {p: "¿Cuál es el color de la pañoleta nacional?", o: ["Rojo, azul y blanco", "Verde y gris", "Azul entero"], c: "Rojo, azul y blanco"},
-            {p: "¿Qué significa la Flor de Lis?", o: ["Símbolo Scout", "Una planta real", "Un nudo"], c: "Símbolo Scout"},
-            {p: "¿Qué es la 'Buena Acción' diaria?", o: ["Ayudar al prójimo", "Hacer ejercicio", "Ganar dinero"], c: "Ayudar al prójimo"},
-            {p: "¿Cuál es la capital de Chile?", o: ["Santiago", "Valdivia", "Concepción"], c: "Santiago"},
-            {p: "¿Qué idioma se habla en Brasil?", o: ["Portugués", "Español", "Francés"], c: "Portugués"},
-            {p: "¿Cuál es el planeta más grande?", o: ["Júpiter", "Marte", "Saturno"], c: "Júpiter"},
-            {p: "¿En qué continente está Egipto?", o: ["África", "Asia", "Europa"], c: "África"},
-            {p: "¿Quién pintó la Mona Lisa?", o: ["Da Vinci", "Picasso", "Dalí"], c: "Da Vinci"},
-            {p: "¿Cuál es el metal más caro del mundo?", o: ["Rodio", "Oro", "Plata"], c: "Rodio"},
-            {p: "¿Héroe del Combate Naval de Iquique?", o: ["Arturo Prat", "O'Higgins", "Baquedano"], c: "Arturo Prat"},
-            {p: "¿Qué país tiene forma de bota?", o: ["Italia", "Chile", "Grecia"], c: "Italia"}
+            {p: "¿Cuál es la comida favorita de Emi?", o: ["Pepinillo", "Pepino", "Pickle"], c: "Pepinillo"},
+            {p: "¿Cuál es el nombre de la hija de la Vero?", o: ["Alice", "Alicia", "Aliss"], c: "Alice"},
+            {p: "¿Qué instrumento tocó Martincito durante Camver 2026?", o: ["Guitarra", "Ukelele", "Violín"], c: "Guitarra"},
+            {p: "¿Qué animal picó el pie de Isi durante Camver 2026?", o: ["Avispa", "Abeja", "Avión"], c: "Avispa"},
+            {p: "¿Qué le salió a Franco en la colita durante Paxtú?", o: ["Abceso", "Acceso", "Esspreso (Un café)"], c: "Abceso"},
+            {p: "¿Por qué razón entró Choli al grupo?", o: ["Lo invitaron", "Hurto a mano armada", "Raptamos a su familia"], c: "Lo invitaron"},
+            {p: "¿Qué practica Matoas online?", o: ["Danza", "Acupuntura", "Armado y desarmado de bombas"], c: "Danza"},
+            {p: "¿Qué significan los colores rojo y blanco del pañolín de grupo?", o: ["Pureza y sangre mapuche", "Bastón de caramelo", "Rojo por el clan y blanco por la nieve"], c: "Pureza y sangre mapuche"},
+            {p: "¿Quién pintó a la Mona Lisa?", o: ["El tío Da Vinci", "Arturo Pratt", "Piñera"], c: "El tío Da Vinci"},
+            {p: "¿Cuál es el país más grande del mundo?", o: ["Rusia", "Patricia Maldonado", "Júpiter"], c: "Rusia"},
+            {p: "¿Cuál es el metal cuyo símbolo químico es 'Au'?", o: ["Oro", "Crucero", "Básquetbol"], c: "Oro"},
+            {p: "¿Cuál es el río más largo del mundo?", o: ["Amazonas", "Río Rahue", "Mapocho"], c: "Amazonas"},
+            {p: "¿Quién fue la tercera pareja de Gala en 'Volverías con tu ex'?", o: ["Leandro", "Marco", "Luis"], c: "Leandro"},
+            {p: "¿Quién del clan es gachatuber famoso en secreto?", o: ["Ro", "Matoas", "May"], c: "Ro"},
+            {p: "¿Cómo se llamaba el programa donde bailaban 'axé'?", o: ["Mekano", "Rojo", "Calle 7"], c: "Mekano"},
+            {p: "¿Qué personaje decía '¡Tangananica o tangananá!'?", o: ["Guru Guru", "Tulio Triviño", "Juan Carlos Bodoque"], c: "Guru Guru"}
         ];
 
         let puntaje = 0;
@@ -89,6 +89,7 @@
 
                     if (opcion === q.c) {
                         b.style.background = "#2ed573";
+                        b.style.transform = "scale(1.05)";
                         puntaje += 5000;
                     } else {
                         b.style.background = "#ff4757";
