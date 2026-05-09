@@ -16,6 +16,26 @@
         .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #007bff; border: none; color: white; border-radius: 8px; font-size: 18px; cursor: pointer; }
         #timer { font-size: 28px; color: #ff4757; font-weight: bold; }
         .hidden { display: none; }
+        .btn {
+            transition: all 0.3s ease; /* Animación suave de color y tamaño */
+        }
+
+        /* Animación de pulso para la respuesta correcta cuando te equivocas */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Animación de entrada para la pregunta */
+        h2 {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -66,21 +86,50 @@
             clearInterval(t);
             segs = 15;
             document.getElementById('timer').innerText = segs;
+            
             const q = banco[Math.floor(Math.random() * banco.length)];
             document.getElementById('question').innerText = q.p;
+            
             const caja = document.getElementById('options');
             caja.innerHTML = '';
-            q.o.sort(() => Math.random() - 0.5).forEach(opc => {
+            
+            const opcionesMezcladas = [...q.o].sort(() => Math.random() - 0.5);
+            
+            opcionesMezcladas.forEach(opcion => {
                 const b = document.createElement('button');
                 b.className = 'btn';
-                b.innerText = opc;
+                b.innerText = opcion;
+                
                 b.onclick = () => {
-                    if (opc === q.c) puntaje += 5000;
+                    // Bloquear otros clics mientras se muestra la respuesta
+                    const botones = caja.querySelectorAll('.btn');
+                    botones.forEach(btn => btn.style.pointerEvents = 'none');
+                    clearInterval(t);
+
+                    if (opcion === q.c) {
+                        // ACIERTO: Solo verde
+                        b.style.background = "#2ed573"; 
+                        b.style.transform = "scale(1.05)";
+                        puntaje += 5000;
+                    } else {
+                        // ERROR: Rojo el elegido, verde el correcto
+                        b.style.background = "#ff4757";
+                        botones.forEach(btn => {
+                            if (btn.innerText === q.c) {
+                                btn.style.background = "#2ed573";
+                                btn.style.animation = "pulse 0.5s infinite";
+                            }
+                        });
+                    }
+
                     document.getElementById('score').innerText = puntaje;
-                    cargar();
+                    
+                    // Esperar 1.5 segundos para ver el resultado antes de la siguiente
+                    setTimeout(cargar, 1500);
                 };
                 caja.appendChild(b);
             });
+
             t = setInterval(() => {
                 segs--;
                 document.getElementById('timer').innerText = segs;
