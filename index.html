@@ -1,0 +1,82 @@
+import random
+from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.clock import Clock
+from kivy.properties import NumericProperty, StringProperty, ListProperty
+
+# --- Banco de Preguntas ---
+# 8 de Cultura General y 8 de Guías y Scouts de Chile
+PREGUNTAS_DB = [
+    {"q": "¿Cuál es el color de la flor nacional de Chile?", "a": ["Rojo", "Blanco", "Azul"], "c": "Rojo", "t": "Cultura"},
+    {"q": "¿Qué planeta es conocido como el planeta rojo?", "a": ["Marte", "Venus", "Júpiter"], "c": "Marte", "t": "Cultura"},
+    {"q": "¿Cuál es el río más largo del mundo?", "a": ["Amazonas", "Nilo", "Misisipi"], "c": "Amazonas", "t": "Cultura"},
+    {"q": "¿Quién escribió 'El Quijote'?", "a": ["Cervantes", "Shakespeare", "Neruda"], "c": "Cervantes", "t": "Cultura"},
+    {"q": "¿En qué continente está Egipto?", "a": ["África", "Asia", "Europa"], "c": "África", "t": "Cultura"},
+    {"q": "¿Cuál es el metal más caro del mundo?", "a": ["Rodio", "Oro", "Plata"], "c": "Rodio", "t": "Cultura"},
+    {"q": "¿Cuántos años dura un lustro?", "a": ["5 años", "10 años", "100 años"], "c": "5 años", "t": "Cultura"},
+    {"q": "¿Cuál es el océano más grande?", "a": ["Pacífico", "Atlántico", "Indico"], "c": "Pacífico", "t": "Cultura"},
+    
+    # Guías y Scouts de Chile
+    {"q": "¿Quién fundó el Movimiento Scout?", "a": ["Baden-Powell", "Dr. Alcibíades Vicencio", "Joaquín Cabezas"], "c": "Baden-Powell", "t": "Scout"},
+    {"q": "¿Cuál es el lema de los Scouts?", "a": ["Siempre Listos", "Servir", "Mejor Verdad"], "c": "Siempre Listos", "t": "Scout"},
+    {"q": "¿Cuál es la flor que representa a las Guías?", "a": ["Trébol", "Lis", "Copihue"], "c": "Trébol", "t": "Scout"},
+    {"q": "¿Cómo se llama el fundador del Scoutismo en Chile?", "a": ["Alcibíades Vicencio", "Baden-Powell", "Bernardo O'Higgins"], "c": "Alcibíades Vicencio", "t": "Scout"},
+    {"q": "¿Qué significa la 'Buena Acción' diaria?", "a": ["Ayudar al prójimo", "Ganar puntos", "Limpiar mi cuarto"], "c": "Ayudar al prójimo", "t": "Scout"},
+    {"q": "¿Cuántas partes tiene la Promesa Scout?", "a": ["Tres partes", "Dos partes", "Cinco partes"], "c": "Tres partes", "t": "Scout"},
+    {"q": "¿Cómo se llama la unidad de los más pequeños (6-11 años)?", "a": ["Lobatos/Golondrinas", "Pioneros", "Ruta"], "c": "Lobatos/Golondrinas", "t": "Scout"},
+    {"q": "¿Cuál es la seña Scout?", "a": ["3 dedos levantados", "Mano cerrada", "V de victoria"], "c": "3 dedos levantados", "t": "Scout"},
+]
+
+class GameScreen(Screen):
+    pregunta_texto = StringProperty("")
+    opciones = ListProperty(["", "", ""])
+    puntos = NumericProperty(0)
+    tiempo = NumericProperty(15)
+    
+    def on_enter(self):
+        self.preguntas_restantes = list(PREGUNTAS_DB)
+        random.shuffle(self.preguntas_restantes)
+        self.puntos = 0
+        self.siguiente_pregunta()
+
+    def siguiente_pregunta(self):
+        if self.puntos >= 40000:
+            self.manager.current = 'felicidades'
+            return
+
+        if not self.preguntas_restantes:
+            # Si se acaban las 16, volvemos a mezclarlas para seguir sumando hasta 40k
+            self.preguntas_restantes = list(PREGUNTAS_DB)
+            random.shuffle(self.preguntas_restantes)
+
+        self.pregunta_actual = self.preguntas_restantes.pop()
+        self.pregunta_texto = self.pregunta_actual["q"]
+        self.opciones = self.pregunta_actual["a"]
+        random.shuffle(self.opciones)
+        self.tiempo = 15
+        
+        Clock.unschedule(self.update_timer)
+        Clock.schedule_interval(self.update_timer, 1)
+
+    def update_timer(self, dt):
+        self.tiempo -= 1
+        if self.tiempo <= 0:
+            self.siguiente_pregunta()
+
+    def verificar_respuesta(self, respuesta):
+        if respuesta == self.pregunta_actual["c"]:
+            self.puntos += 500
+        self.siguiente_pregunta()
+
+class WinScreen(Screen):
+    pass
+
+class RaulitoQuiz(App):
+    def build(self):
+        sm = ScreenManager()
+        sm.add_widget(GameScreen(name='juego'))
+        sm.add_widget(WinScreen(name='felicidades'))
+        return sm
+
+if __name__ == '__main__':
+    RaulitoQuiz().run()
